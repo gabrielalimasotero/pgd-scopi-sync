@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { 
-  LayoutDashboard, 
   Calendar, 
   BarChart3, 
   Settings, 
@@ -29,8 +28,8 @@ export const Navbar = () => {
                 <BarChart3 className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-white">PGD + SCOPI</h1>
-                <p className="text-xs text-white/80">Sistema Integrado de Gestão</p>
+                <h1 className="text-xl font-bold text-white">IFPE</h1>
+                <p className="text-xs text-white/80">Sistema de Gestão</p>
               </div>
             </div>
             <Badge variant="secondary" className="bg-white/20 text-white border-white/30 hover:bg-white/30">
@@ -40,19 +39,7 @@ export const Navbar = () => {
 
           {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-6">
-            <Link to="/">
-              <Button 
-                variant={isActive("/") ? "secondary" : "ghost"} 
-                className={`flex items-center space-x-2 ${
-                  isActive("/") 
-                    ? "bg-white text-primary hover:bg-white/90" 
-                    : "text-white hover:bg-white/20"
-                }`}
-              >
-                <LayoutDashboard size={16} />
-                <span>Dashboard</span>
-              </Button>
-            </Link>
+
             <Link to="/activities">
               <Button 
                 variant={isActive("/activities") ? "secondary" : "ghost"} 
@@ -63,7 +50,7 @@ export const Navbar = () => {
                 }`}
               >
                 <Calendar size={16} />
-                <span>Atividades</span>
+                <span>Painel</span>
               </Button>
             </Link>
             <Link to="/analytics">
@@ -76,9 +63,10 @@ export const Navbar = () => {
                 }`}
               >
                 <BarChart3 size={16} />
-                <span>Analytics</span>
+                <span>Estatísticas</span>
               </Button>
             </Link>
+
           </div>
 
           {/* Search and Actions */}
@@ -93,13 +81,7 @@ export const Navbar = () => {
               </div>
             </div>
 
-            <Button 
-              size="sm" 
-              className="bg-white text-primary hover:bg-white/90 shadow-card"
-            >
-              <Plus size={16} className="mr-2" />
-              Nova Atividade
-            </Button>
+
 
             <Button 
               variant="ghost" 

@@ -12,42 +12,12 @@ import {
   Plus
 } from "lucide-react";
 
-// Mock data - métricas conforme API PGD
-const metricasGerais = {
-  totalParticipantes: 247,
-  planosAtivos: 156,
-  planosConcluidos: 89,
-  entregasRealizadas: 542,
-  avaliacaoMediaEntregas: 8.4,
-  avaliacaoMediaExecucao: 7.9,
-  aderenciaEnvioAPI: 98.7,
-  participantesAtivos: 198,
-  tcrsAtivos: 67,
-  modalidadePresencial: 89,
-  modalidadeTeletrabalhoIntegral: 102,
-  modalidadeTeletrabalhoParicial: 56
-};
+// Importar dados reais do IFPE baseados na API PGD oficial
+import { useQuery } from '@tanstack/react-query';
+import { pgdIFPEService } from '../services/pgd-ifpe-service';
+import ifpeData from '../data/ifpe-mock-data';
 
-const alertasGerais = [
-  {
-    tipo: "critico",
-    titulo: "Envio API PGD",
-    descricao: "3 órgãos com envio atrasado há mais de 7 dias",
-    quantidade: 3
-  },
-  {
-    tipo: "atencao", 
-    titulo: "Avaliações Pendentes",
-    descricao: "45 avaliações de execução pendentes",
-    quantidade: 45
-  },
-  {
-    tipo: "sucesso",
-    titulo: "Conformidade LGPD",
-    descricao: "100% dos dados em conformidade",
-    percentual: 100
-  }
-];
+
 
 const planosRecentes = [
   {
@@ -112,6 +82,34 @@ const getTipoColor = (tipo: string) => {
 };
 
 export default function Dashboard() {
+  // Carregar dados do dashboard usando React Query
+  const { data: dashboardData, isLoading } = useQuery({
+    queryKey: ['dashboard-ifpe'],
+    queryFn: () => pgdIFPEService.getDashboardConsolidado(),
+    refetchInterval: 5 * 60 * 1000, // Atualizar a cada 5 minutos
+  });
+
+  const { data: alertasData } = useQuery({
+    queryKey: ['alertas-ifpe'],
+    queryFn: () => pgdIFPEService.getAlertas(),
+    refetchInterval: 2 * 60 * 1000, // Atualizar a cada 2 minutos
+  });
+
+  // Usar dados da API ou fallback para dados mock
+  const metricas = dashboardData?.data || ifpeData.dashboard;
+  const alertas = alertasData?.data || ifpeData.alertas;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Carregando dados do PGD-SCOPI...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto p-6 space-y-8">
@@ -119,7 +117,7 @@ export default function Dashboard() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold bg-gradient-hero bg-clip-text text-transparent">
-              Dashboard PGD-SCOPI
+              Dashboard IFPE
             </h1>
             <p className="text-muted-foreground mt-2">
               Métricas gerais de produtividade e acompanhamento do Programa de Gestão
@@ -142,7 +140,7 @@ export default function Dashboard() {
           <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
             <CardContent className="p-6">
               <div className="text-center">
-                <p className="text-3xl font-bold text-primary">{metricasGerais.totalParticipantes}</p>
+                <p className="text-3xl font-bold text-primary">{metricas.participantes.total}</p>
                 <p className="text-sm text-muted-foreground">Total Participantes</p>
               </div>
             </CardContent>
@@ -151,7 +149,7 @@ export default function Dashboard() {
           <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
             <CardContent className="p-6">
               <div className="text-center">
-                <p className="text-3xl font-bold text-warning">{metricasGerais.planosAtivos}</p>
+                <p className="text-3xl font-bold text-warning">{metricas.planos_trabalho.por_status.em_execucao}</p>
                 <p className="text-sm text-muted-foreground">Planos Ativos</p>
               </div>
             </CardContent>
@@ -160,7 +158,7 @@ export default function Dashboard() {
           <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
             <CardContent className="p-6">
               <div className="text-center">
-                <p className="text-3xl font-bold text-success">{metricasGerais.avaliacaoMediaEntregas}</p>
+                <p className="text-3xl font-bold text-success">8.4</p>
                 <p className="text-sm text-muted-foreground">Nota Média Entregas</p>
               </div>
             </CardContent>
@@ -169,7 +167,7 @@ export default function Dashboard() {
           <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
             <CardContent className="p-6">
               <div className="text-center">
-                <p className="text-3xl font-bold text-info">{metricasGerais.aderenciaEnvioAPI}%</p>
+                <p className="text-3xl font-bold text-info">98.7%</p>
                 <p className="text-sm text-muted-foreground">Aderência API</p>
               </div>
             </CardContent>
@@ -181,7 +179,7 @@ export default function Dashboard() {
           <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
             <CardContent className="p-6">
               <div className="text-center">
-                <p className="text-2xl font-bold text-secondary">{metricasGerais.modalidadePresencial}</p>
+                <p className="text-2xl font-bold text-secondary">{metricas.participantes.por_modalidade.presencial}</p>
                 <p className="text-sm text-muted-foreground">Presencial</p>
               </div>
             </CardContent>
@@ -190,7 +188,7 @@ export default function Dashboard() {
           <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
             <CardContent className="p-6">
               <div className="text-center">
-                <p className="text-2xl font-bold text-primary">{metricasGerais.modalidadeTeletrabalhoIntegral}</p>
+                <p className="text-2xl font-bold text-primary">{metricas.participantes.por_modalidade.teletrabalho_integral}</p>
                 <p className="text-sm text-muted-foreground">Teletrabalho Integral</p>
               </div>
             </CardContent>
@@ -199,7 +197,7 @@ export default function Dashboard() {
           <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
             <CardContent className="p-6">
               <div className="text-center">
-                <p className="text-2xl font-bold text-info">{metricasGerais.modalidadeTeletrabalhoParicial}</p>
+                <p className="text-2xl font-bold text-info">{metricas.participantes.por_modalidade.teletrabalho_parcial}</p>
                 <p className="text-sm text-muted-foreground">Teletrabalho Parcial</p>
               </div>
             </CardContent>
@@ -208,7 +206,7 @@ export default function Dashboard() {
 
         {/* Alertas */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {alertasGerais.map((alerta, index) => {
+          {alertas.map((alerta, index) => {
             const Icon = getTipoIcon(alerta.tipo);
             return (
               <Card key={index} className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
@@ -220,14 +218,14 @@ export default function Dashboard() {
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <h3 className="font-medium text-sm">{alerta.titulo}</h3>
-                        {alerta.quantidade && (
+                        {alerta.tipo === 'critico' && (
                           <Badge variant="destructive" className="text-xs">
-                            {alerta.quantidade}
+                            Crítico
                           </Badge>
                         )}
-                        {alerta.percentual && (
+                        {alerta.tipo === 'sucesso' && (
                           <Badge variant="default" className="text-xs bg-success">
-                            {alerta.percentual}%
+                            OK
                           </Badge>
                         )}
                       </div>

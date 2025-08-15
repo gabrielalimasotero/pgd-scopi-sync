@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { DashboardStats } from "@/components/DashboardStats";
 import { 
   BarChart3, 
   TrendingUp, 
@@ -11,8 +12,17 @@ import {
   Calendar,
   Zap,
   Award,
-  Clock
+  Clock,
+  CalendarDays,
+  AlertTriangle,
+  CheckCircle2,
+  Plus
 } from "lucide-react";
+
+// Importar dados reais do IFPE baseados na API PGD oficial
+import { useQuery } from '@tanstack/react-query';
+import { pgdIFPEService } from '../services/pgd-ifpe-service';
+import ifpeData from '../data/ifpe-mock-data';
 import { 
   BarChart, 
   Bar, 
@@ -34,12 +44,12 @@ import {
 } from "recharts";
 
 const performanceData = [
-  { month: 'Jul', pgd: 82, scopi: 88, meta: 85 },
-  { month: 'Ago', pgd: 85, scopi: 90, meta: 85 },
-  { month: 'Set', pgd: 88, scopi: 92, meta: 85 },
-  { month: 'Out', pgd: 87, scopi: 94, meta: 85 },
-  { month: 'Nov', pgd: 90, scopi: 95, meta: 85 },
-  { month: 'Dez', pgd: 93, scopi: 97, meta: 85 },
+  { month: 'Jul', desempenho: 88, eficiencia: 82, meta: 85 },
+  { month: 'Ago', desempenho: 90, eficiencia: 85, meta: 85 },
+  { month: 'Set', desempenho: 92, eficiencia: 88, meta: 85 },
+  { month: 'Out', desempenho: 94, eficiencia: 87, meta: 85 },
+  { month: 'Nov', desempenho: 95, eficiencia: 90, meta: 85 },
+  { month: 'Dez', desempenho: 97, eficiencia: 93, meta: 85 },
 ];
 
 const departmentMetrics = [
@@ -51,10 +61,10 @@ const departmentMetrics = [
 ];
 
 const productivityTrend = [
-  { week: 'Sem 1', activities: 45, completed: 38, efficiency: 84 },
-  { week: 'Sem 2', activities: 52, completed: 47, efficiency: 90 },
-  { week: 'Sem 3', activities: 48, completed: 44, efficiency: 92 },
-  { week: 'Sem 4', activities: 55, completed: 52, efficiency: 95 },
+  { week: 'Sem 1', atividades: 45, concluidas: 38, eficiencia: 84 },
+  { week: 'Sem 2', atividades: 52, concluidas: 47, eficiencia: 90 },
+  { week: 'Sem 3', atividades: 48, concluidas: 44, eficiencia: 92 },
+  { week: 'Sem 4', atividades: 55, concluidas: 52, eficiencia: 95 },
 ];
 
 const timeDistribution = [
@@ -64,7 +74,63 @@ const timeDistribution = [
   { name: 'Documentação', value: 10, color: 'hsl(var(--warning))' },
 ];
 
+
+
+const getTipoIcon = (tipo: string) => {
+  switch (tipo) {
+    case "critico":
+      return AlertTriangle;
+    case "atencao": 
+      return Clock;
+    case "sucesso":
+      return CheckCircle2;
+    default:
+      return TrendingUp;
+  }
+};
+
+const getTipoColor = (tipo: string) => {
+  switch (tipo) {
+    case "critico":
+      return "bg-destructive/10 text-destructive";
+    case "atencao":
+      return "bg-warning/10 text-warning"; 
+    case "sucesso":
+      return "bg-success/10 text-success";
+    default:
+      return "bg-info/10 text-info";
+  }
+};
+
 export default function Analytics() {
+  // Carregar dados do dashboard usando React Query
+  const { data: dashboardData, isLoading } = useQuery({
+    queryKey: ['dashboard-ifpe'],
+    queryFn: () => pgdIFPEService.getDashboardConsolidado(),
+    refetchInterval: 5 * 60 * 1000, // Atualizar a cada 5 minutos
+  });
+
+  const { data: alertasData } = useQuery({
+    queryKey: ['alertas-ifpe'],
+    queryFn: () => pgdIFPEService.getAlertas(),
+    refetchInterval: 2 * 60 * 1000, // Atualizar a cada 2 minutos
+  });
+
+  // Usar dados da API ou fallback para dados mock
+  const metricas = dashboardData?.data || ifpeData.dashboard;
+  const alertas = alertasData?.data || ifpeData.alertas;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Carregando dados do Painel-Estatísticas...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto p-6 space-y-8">
@@ -72,10 +138,10 @@ export default function Analytics() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold bg-gradient-hero bg-clip-text text-transparent">
-              Analytics SCOPI
+              Estatísticas
             </h1>
             <p className="text-muted-foreground mt-2">
-              Análise avançada de desempenho e métricas de produtividade
+              Análise e quantificação de dados do Painel através do sistema de Estatísticas
             </p>
           </div>
           <div className="flex gap-3">
@@ -98,7 +164,7 @@ export default function Analytics() {
           </div>
         </div>
 
-        {/* Key Performance Indicators */}
+        {/* Indicadores Chave de Desempenho */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-primary/10 rounded-full -mr-10 -mt-10" />
@@ -169,12 +235,118 @@ export default function Analytics() {
           </Card>
         </div>
 
-        {/* Performance Comparison Chart */}
+        {/* Métricas Principais API Painel */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
+            <CardContent className="p-6">
+              <div className="text-center">
+                <p className="text-3xl font-bold text-primary">{metricas.participantes.total}</p>
+                <p className="text-sm text-muted-foreground">Total Participantes</p>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
+            <CardContent className="p-6">
+              <div className="text-center">
+                <p className="text-3xl font-bold text-warning">{metricas.planos_trabalho.por_status.em_execucao}</p>
+                <p className="text-sm text-muted-foreground">Planos Ativos</p>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
+            <CardContent className="p-6">
+              <div className="text-center">
+                <p className="text-3xl font-bold text-success">8.4</p>
+                <p className="text-sm text-muted-foreground">Nota Média Entregas</p>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
+            <CardContent className="p-6">
+              <div className="text-center">
+                <p className="text-3xl font-bold text-info">98.7%</p>
+                <p className="text-sm text-muted-foreground">Aderência API</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Métricas Modalidades */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
+            <CardContent className="p-6">
+              <div className="text-center">
+                <p className="text-2xl font-bold text-secondary">{metricas.participantes.por_modalidade.presencial}</p>
+                <p className="text-sm text-muted-foreground">Presencial</p>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
+            <CardContent className="p-6">
+              <div className="text-center">
+                <p className="text-2xl font-bold text-primary">{metricas.participantes.por_modalidade.teletrabalho_integral}</p>
+                <p className="text-sm text-muted-foreground">Teletrabalho Integral</p>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
+            <CardContent className="p-6">
+              <div className="text-center">
+                <p className="text-2xl font-bold text-info">{metricas.participantes.por_modalidade.teletrabalho_parcial}</p>
+                <p className="text-sm text-muted-foreground">Teletrabalho Parcial</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Alertas */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {alertas.map((alerta, index) => {
+            const Icon = getTipoIcon(alerta.tipo);
+            return (
+              <Card key={index} className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
+                <CardContent className="p-4">
+                  <div className="flex items-start gap-3">
+                    <div className={`p-2 rounded-lg ${getTipoColor(alerta.tipo)}`}>
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-medium text-sm">{alerta.titulo}</h3>
+                        {alerta.tipo === 'critico' && (
+                          <Badge variant="destructive" className="text-xs">
+                            Crítico
+                          </Badge>
+                        )}
+                        {alerta.tipo === 'sucesso' && (
+                          <Badge variant="default" className="text-xs bg-success">
+                            OK
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">{alerta.descricao}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+
+        {/* Dashboard Stats Integration */}
+        <DashboardStats />
+
+        {/* Gráfico de Análise de Desempenho */}
         <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BarChart3 className="h-5 w-5 text-primary" />
-              Evolução de Performance - PGD vs SCOPI
+              Análise Temporal dos Dados do Painel
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -192,18 +364,18 @@ export default function Analytics() {
                 />
                 <Line 
                   type="monotone" 
-                  dataKey="pgd" 
+                  dataKey="desempenho" 
                   stroke="hsl(var(--primary))" 
                   strokeWidth={3}
-                  name="PGD"
+                  name="Desempenho"
                   dot={{ fill: 'hsl(var(--primary))', strokeWidth: 2, r: 6 }}
                 />
                 <Line 
                   type="monotone" 
-                  dataKey="scopi" 
+                  dataKey="eficiencia" 
                   stroke="hsl(var(--info))" 
                   strokeWidth={3}
-                  name="SCOPI"
+                  name="Eficiência"
                   dot={{ fill: 'hsl(var(--info))', strokeWidth: 2, r: 6 }}
                 />
                 <Line 
@@ -220,12 +392,12 @@ export default function Analytics() {
         </Card>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Department Radar Chart */}
+          {/* Gráfico Radar por Departamento */}
           <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Target className="h-5 w-5 text-primary" />
-                Performance por Departamento
+                Desempenho por Departamento
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -268,7 +440,7 @@ export default function Analytics() {
             </CardContent>
           </Card>
 
-          {/* Time Distribution */}
+          {/* Distribuição de Tempo */}
           <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -311,12 +483,13 @@ export default function Analytics() {
           </Card>
         </div>
 
-        {/* Productivity Trends */}
+
+        {/* Tendências de Produtividade */}
         <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5 text-primary" />
-              Tendência de Produtividade Semanal
+              Análise Semanal de Produtividade
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -326,8 +499,8 @@ export default function Analytics() {
                 <XAxis dataKey="week" stroke="hsl(var(--muted-foreground))" />
                 <YAxis stroke="hsl(var(--muted-foreground))" />
                 <Tooltip />
-                <Bar dataKey="activities" fill="hsl(var(--primary))" name="Atividades" radius={4} />
-                <Bar dataKey="completed" fill="hsl(var(--success))" name="Concluídas" radius={4} />
+                <Bar dataKey="atividades" fill="hsl(var(--primary))" name="Atividades" radius={4} />
+                <Bar dataKey="concluidas" fill="hsl(var(--success))" name="Concluídas" radius={4} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>

@@ -7,6 +7,7 @@ import { Navbar } from "@/components/Navbar";
 import Index from "./pages/Index";
 import Activities from "./pages/Activities";
 import Analytics from "./pages/Analytics";
+
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ const App = () => (
                 <Analytics />
               </>
             } />
+
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

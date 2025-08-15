@@ -13,12 +13,12 @@ import {
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
 
 const productivityData = [
-  { month: 'Jan', pgd: 85, scopi: 92 },
-  { month: 'Fev', pgd: 88, scopi: 94 },
-  { month: 'Mar', pgd: 82, scopi: 90 },
-  { month: 'Abr', pgd: 91, scopi: 96 },
-  { month: 'Mai', pgd: 89, scopi: 93 },
-  { month: 'Jun', pgd: 93, scopi: 97 },
+  { month: 'Jan', desempenho: 92, qualidade: 85 },
+  { month: 'Fev', desempenho: 94, qualidade: 88 },
+  { month: 'Mar', desempenho: 90, qualidade: 82 },
+  { month: 'Abr', desempenho: 96, qualidade: 91 },
+  { month: 'Mai', desempenho: 93, qualidade: 89 },
+  { month: 'Jun', desempenho: 97, qualidade: 93 },
 ];
 
 const activityStatusData = [
@@ -39,11 +39,11 @@ const teamEfficiencyData = [
 export const DashboardStats = () => {
   return (
     <div className="space-y-6">
-      {/* Key Metrics */}
+      {/* Métricas Principais */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total de Atividades</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Painel</CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -80,7 +80,7 @@ export const DashboardStats = () => {
 
         <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Eficiência SCOPI</CardTitle>
+            <CardTitle className="text-sm font-medium">Análise Estatísticas</CardTitle>
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -94,12 +94,12 @@ export const DashboardStats = () => {
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Productivity Comparison */}
+        {/* Comparação de Produtividade */}
         <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5 text-primary" />
-              Evolução da Produtividade
+              Análise de Desempenho
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -109,19 +109,19 @@ export const DashboardStats = () => {
                 <XAxis dataKey="month" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="pgd" fill="hsl(var(--primary))" name="PGD" radius={4} />
-                <Bar dataKey="scopi" fill="hsl(var(--info))" name="SCOPI" radius={4} />
+                <Bar dataKey="desempenho" fill="hsl(var(--primary))" name="Desempenho" radius={4} />
+                <Bar dataKey="qualidade" fill="hsl(var(--info))" name="Qualidade" radius={4} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        {/* Activity Status Distribution */}
+        {/* Distribuição de Status das Atividades */}
         <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Target className="h-5 w-5 text-primary" />
-              Status das Atividades
+              Status do Painel
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -159,7 +159,7 @@ export const DashboardStats = () => {
         </Card>
       </div>
 
-      {/* Team Efficiency */}
+      {/* Eficiência por Equipe */}
       <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">

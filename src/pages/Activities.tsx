@@ -308,10 +308,10 @@ export default function Activities() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold bg-gradient-hero bg-clip-text text-transparent">
-              Planos de Trabalho PGD
+              Painel
             </h1>
             <p className="text-muted-foreground mt-2">
-              Listagem dos planos de trabalho cadastrados no Programa de Gestão
+              Gestão e acompanhamento de planos de trabalho
             </p>
           </div>
           <Button className="bg-gradient-primary hover:opacity-90">
@@ -393,7 +393,7 @@ export default function Activities() {
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5 text-primary" />
-                Lista de Planos de Trabalho PGD
+                Lista de Planos de Trabalho
               </CardTitle>
               <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
                 {filteredActivities.length} planos de trabalho
@@ -526,6 +526,54 @@ export default function Activities() {
                   </Button>
                 </div>
               )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Últimos Planos de Trabalho */}
+        <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <Clock className="h-5 w-5 text-primary" />
+                Últimos Planos de Trabalho
+              </CardTitle>
+              <Button variant="outline" size="sm">
+                Ver Todos
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {pgdActivities.slice(0, 3).map((atividade) => (
+                <div key={atividade.planoTrabalho.id} className="flex items-center justify-between p-4 rounded-lg border border-border/50 hover:border-primary/20 transition-colors">
+                  <div className="flex items-center gap-4">
+                    <Badge variant="outline" className="font-mono text-xs">
+                      {atividade.planoTrabalho.id}
+                    </Badge>
+                    <div>
+                      <p className="font-medium text-sm">{atividade.participante.nomeCompleto}</p>
+                      <p className="text-xs text-muted-foreground font-mono">
+                        CPF: {atividade.participante.cpf}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {atividade.entregas.length} entregas
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="text-right">
+                      <p className="text-sm font-medium">
+                        {atividade.avaliacaoExecucao.nota ? `Nota: ${atividade.avaliacaoExecucao.nota}` : 'Sem avaliação'}
+                      </p>
+                      <p className="text-xs text-muted-foreground">{atividade.planoTrabalho.dataFim}</p>
+                    </div>
+                    <Badge className={getStatusColor(atividade.planoTrabalho.status)}>
+                      {getStatusText(atividade.planoTrabalho.status)}
+                    </Badge>
+                  </div>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
