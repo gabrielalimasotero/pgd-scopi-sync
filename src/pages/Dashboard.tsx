@@ -12,62 +12,75 @@ import {
   Plus
 } from "lucide-react";
 
-// Mock data - métricas gerais
+// Mock data - métricas conforme API PGD
 const metricasGerais = {
-  totalServidores: 247,
-  atividadesAtivas: 156,
-  atividadesConcluidas: 89,
-  horasTrabalhadas: 12450,
-  eficienciaMedia: 87.3,
-  tempoMedioEntrega: 15.2,
-  aderenciaPrograma: 94.1,
-  servidoresAtivos: 198
+  totalParticipantes: 247,
+  planosAtivos: 156,
+  planosConcluidos: 89,
+  entregasRealizadas: 542,
+  avaliacaoMediaEntregas: 8.4,
+  avaliacaoMediaExecucao: 7.9,
+  aderenciaEnvioAPI: 98.7,
+  participantesAtivos: 198,
+  tcrsAtivos: 67,
+  modalidadePresencial: 89,
+  modalidadeTeletrabalhoIntegral: 102,
+  modalidadeTeletrabalhoParicial: 56
 };
 
 const alertasGerais = [
   {
     tipo: "critico",
-    titulo: "Meta de Aderência",
-    descricao: "13 servidores sem atividades há mais de 15 dias",
-    quantidade: 13
+    titulo: "Envio API PGD",
+    descricao: "3 órgãos com envio atrasado há mais de 7 dias",
+    quantidade: 3
   },
   {
     tipo: "atencao", 
-    titulo: "Atividades Atrasadas",
-    descricao: "23 atividades com prazo vencido",
-    quantidade: 23
+    titulo: "Avaliações Pendentes",
+    descricao: "45 avaliações de execução pendentes",
+    quantidade: 45
   },
   {
     tipo: "sucesso",
-    titulo: "Meta Mensal",
-    descricao: "Meta de conclusão atingida em 104%",
-    percentual: 104
+    titulo: "Conformidade LGPD",
+    descricao: "100% dos dados em conformidade",
+    percentual: 100
   }
 ];
 
-const atividadesRecentes = [
+const planosRecentes = [
   {
-    codigo: "PGD-2024-089",
-    cpfResponsavel: "123.456.789-01",
-    descricao: "Implementação Sistema Avaliação",
-    status: "em_andamento",
-    progresso: 75,
+    id: "PT-2024-089",
+    participante: {
+      cpf: "123.456.789-01",
+      nome: "João Silva Santos"
+    },
+    status: "ATIVO",
+    entregas: 3,
+    avaliacaoMedia: 8.5,
     dataFim: "28/02/2024"
   },
   {
-    codigo: "PGD-2024-087", 
-    cpfResponsavel: "234.567.890-12",
-    descricao: "Capacitação Ferramentas Digitais",
-    status: "concluida",
-    progresso: 100,
+    id: "PT-2024-087", 
+    participante: {
+      cpf: "234.567.890-12",
+      nome: "Maria Oliveira Costa"
+    },
+    status: "CONCLUIDO",
+    entregas: 2,
+    avaliacaoMedia: 9.2,
     dataFim: "30/01/2024"
   },
   {
-    codigo: "PGD-2024-091",
-    cpfResponsavel: "345.678.901-23", 
-    descricao: "Modernização Infraestrutura TI",
-    status: "pendente",
-    progresso: 0,
+    id: "PT-2024-091",
+    participante: {
+      cpf: "345.678.901-23",
+      nome: "Carlos Eduardo Lima"
+    },
+    status: "PENDENTE",
+    entregas: 5,
+    avaliacaoMedia: null,
     dataFim: "15/03/2024"
   }
 ];
@@ -124,13 +137,13 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Métricas Principais */}
+        {/* Métricas Principais API PGD */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
             <CardContent className="p-6">
               <div className="text-center">
-                <p className="text-3xl font-bold text-primary">{metricasGerais.totalServidores}</p>
-                <p className="text-sm text-muted-foreground">Total Servidores</p>
+                <p className="text-3xl font-bold text-primary">{metricasGerais.totalParticipantes}</p>
+                <p className="text-sm text-muted-foreground">Total Participantes</p>
               </div>
             </CardContent>
           </Card>
@@ -138,8 +151,8 @@ export default function Dashboard() {
           <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
             <CardContent className="p-6">
               <div className="text-center">
-                <p className="text-3xl font-bold text-warning">{metricasGerais.atividadesAtivas}</p>
-                <p className="text-sm text-muted-foreground">Atividades Ativas</p>
+                <p className="text-3xl font-bold text-warning">{metricasGerais.planosAtivos}</p>
+                <p className="text-sm text-muted-foreground">Planos Ativos</p>
               </div>
             </CardContent>
           </Card>
@@ -147,8 +160,8 @@ export default function Dashboard() {
           <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
             <CardContent className="p-6">
               <div className="text-center">
-                <p className="text-3xl font-bold text-success">{metricasGerais.eficienciaMedia}%</p>
-                <p className="text-sm text-muted-foreground">Eficiência Média</p>
+                <p className="text-3xl font-bold text-success">{metricasGerais.avaliacaoMediaEntregas}</p>
+                <p className="text-sm text-muted-foreground">Nota Média Entregas</p>
               </div>
             </CardContent>
           </Card>
@@ -156,8 +169,38 @@ export default function Dashboard() {
           <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
             <CardContent className="p-6">
               <div className="text-center">
-                <p className="text-3xl font-bold text-info">{metricasGerais.aderenciaPrograma}%</p>
-                <p className="text-sm text-muted-foreground">Aderência PGD</p>
+                <p className="text-3xl font-bold text-info">{metricasGerais.aderenciaEnvioAPI}%</p>
+                <p className="text-sm text-muted-foreground">Aderência API</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Métricas Modalidades */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
+            <CardContent className="p-6">
+              <div className="text-center">
+                <p className="text-2xl font-bold text-secondary">{metricasGerais.modalidadePresencial}</p>
+                <p className="text-sm text-muted-foreground">Presencial</p>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
+            <CardContent className="p-6">
+              <div className="text-center">
+                <p className="text-2xl font-bold text-primary">{metricasGerais.modalidadeTeletrabalhoIntegral}</p>
+                <p className="text-sm text-muted-foreground">Teletrabalho Integral</p>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
+            <CardContent className="p-6">
+              <div className="text-center">
+                <p className="text-2xl font-bold text-info">{metricasGerais.modalidadeTeletrabalhoParicial}</p>
+                <p className="text-sm text-muted-foreground">Teletrabalho Parcial</p>
               </div>
             </CardContent>
           </Card>
@@ -200,46 +243,51 @@ export default function Dashboard() {
         {/* Main Dashboard Stats */}
         <DashboardStats />
 
-        {/* Atividades Recentes */}
+        {/* Planos Recentes */}
         <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
                 <Clock className="h-5 w-5 text-primary" />
-                Últimas Atividades
+                Últimos Planos de Trabalho
               </CardTitle>
               <Button variant="outline" size="sm">
-                Ver Todas
+                Ver Todos
               </Button>
             </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {atividadesRecentes.map((atividade) => (
-                <div key={atividade.codigo} className="flex items-center justify-between p-4 rounded-lg border border-border/50 hover:border-primary/20 transition-colors">
+              {planosRecentes.map((plano) => (
+                <div key={plano.id} className="flex items-center justify-between p-4 rounded-lg border border-border/50 hover:border-primary/20 transition-colors">
                   <div className="flex items-center gap-4">
                     <Badge variant="outline" className="font-mono text-xs">
-                      {atividade.codigo}
+                      {plano.id}
                     </Badge>
                     <div>
-                      <p className="font-medium text-sm">{atividade.descricao}</p>
+                      <p className="font-medium text-sm">{plano.participante.nome}</p>
                       <p className="text-xs text-muted-foreground font-mono">
-                        CPF: {atividade.cpfResponsavel}
+                        CPF: {plano.participante.cpf}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {plano.entregas} entregas
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="text-right">
-                      <p className="text-sm font-medium">{atividade.progresso}%</p>
-                      <p className="text-xs text-muted-foreground">{atividade.dataFim}</p>
+                      <p className="text-sm font-medium">
+                        {plano.avaliacaoMedia ? `Nota: ${plano.avaliacaoMedia}` : 'Sem avaliação'}
+                      </p>
+                      <p className="text-xs text-muted-foreground">{plano.dataFim}</p>
                     </div>
                     <Badge className={
-                      atividade.status === 'concluida' ? 'bg-success/10 text-success' :
-                      atividade.status === 'em_andamento' ? 'bg-warning/10 text-warning' :
+                      plano.status === 'CONCLUIDO' ? 'bg-success/10 text-success' :
+                      plano.status === 'ATIVO' ? 'bg-warning/10 text-warning' :
                       'bg-muted text-muted-foreground'
                     }>
-                      {atividade.status === 'concluida' ? 'Concluída' :
-                       atividade.status === 'em_andamento' ? 'Em Andamento' : 'Pendente'}
+                      {plano.status === 'CONCLUIDO' ? 'Concluído' :
+                       plano.status === 'ATIVO' ? 'Ativo' : 'Pendente'}
                     </Badge>
                   </div>
                 </div>
