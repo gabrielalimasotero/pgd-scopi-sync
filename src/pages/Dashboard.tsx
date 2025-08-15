@@ -12,90 +12,91 @@ import {
   Plus
 } from "lucide-react";
 
-// Mock data
-const recentActivities = [
+// Mock data - métricas gerais
+const metricasGerais = {
+  totalServidores: 247,
+  atividadesAtivas: 156,
+  atividadesConcluidas: 89,
+  horasTrabalhadas: 12450,
+  eficienciaMedia: 87.3,
+  tempoMedioEntrega: 15.2,
+  aderenciaPrograma: 94.1,
+  servidoresAtivos: 198
+};
+
+const alertasGerais = [
   {
-    id: "1",
-    title: "Implementação do Sistema de Avaliação Digital",
-    description: "Desenvolvimento e implantação de sistema digital para avaliações acadêmicas online com integração ao sistema atual.",
-    status: "in_progress" as const,
-    priority: "high" as const,
-    progress: 75,
-    startDate: "2024-01-15",
-    endDate: "2024-02-28",
-    responsible: { name: "Maria Silva" },
-    reporter: { name: "João Santos" },
-    estimatedHours: 120,
-    actualHours: 90,
-    scopiMetrics: {
-      efficiency: 88,
-      quality: 92,
-      deliveryTime: 85
-    },
-    comments: 5
+    tipo: "critico",
+    titulo: "Meta de Aderência",
+    descricao: "13 servidores sem atividades há mais de 15 dias",
+    quantidade: 13
   },
   {
-    id: "2",
-    title: "Capacitação em Ferramentas Digitais",
-    description: "Programa de capacitação dos servidores em ferramentas digitais para trabalho remoto e gestão de atividades.",
-    status: "completed" as const,
-    priority: "medium" as const,
-    progress: 100,
-    startDate: "2024-01-08",
-    endDate: "2024-01-30",
-    responsible: { name: "Ana Costa" },
-    reporter: { name: "Pedro Lima" },
-    estimatedHours: 80,
-    actualHours: 85,
-    scopiMetrics: {
-      efficiency: 95,
-      quality: 98,
-      deliveryTime: 92
-    },
-    comments: 2
+    tipo: "atencao", 
+    titulo: "Atividades Atrasadas",
+    descricao: "23 atividades com prazo vencido",
+    quantidade: 23
   },
   {
-    id: "3",
-    title: "Modernização da Infraestrutura de TI",
-    description: "Atualização dos equipamentos e infraestrutura de rede para suporte às atividades remotas.",
-    status: "pending" as const,
-    priority: "high" as const,
-    progress: 0,
-    startDate: "2024-02-01",
-    endDate: "2024-03-15",
-    responsible: { name: "Carlos Oliveira" },
-    reporter: { name: "Lucia Fernandes" },
-    estimatedHours: 200,
-    actualHours: 0,
-    scopiMetrics: {
-      efficiency: 0,
-      quality: 0,
-      deliveryTime: 0
-    },
-    comments: 1
+    tipo: "sucesso",
+    titulo: "Meta Mensal",
+    descricao: "Meta de conclusão atingida em 104%",
+    percentual: 104
   }
 ];
 
-const alerts = [
+const atividadesRecentes = [
   {
-    type: "warning",
-    title: "Atividades próximas do prazo",
-    description: "5 atividades vencem nos próximos 3 dias",
-    icon: AlertTriangle
+    codigo: "PGD-2024-089",
+    cpfResponsavel: "123.456.789-01",
+    descricao: "Implementação Sistema Avaliação",
+    status: "em_andamento",
+    progresso: 75,
+    dataFim: "28/02/2024"
   },
   {
-    type: "success", 
-    title: "Meta mensal atingida",
-    description: "87% das atividades foram concluídas no prazo",
-    icon: CheckCircle2
+    codigo: "PGD-2024-087", 
+    cpfResponsavel: "234.567.890-12",
+    descricao: "Capacitação Ferramentas Digitais",
+    status: "concluida",
+    progresso: 100,
+    dataFim: "30/01/2024"
   },
   {
-    type: "info",
-    title: "Atualização SCOPI",
-    description: "Novas métricas de produtividade disponíveis",
-    icon: TrendingUp
+    codigo: "PGD-2024-091",
+    cpfResponsavel: "345.678.901-23", 
+    descricao: "Modernização Infraestrutura TI",
+    status: "pendente",
+    progresso: 0,
+    dataFim: "15/03/2024"
   }
 ];
+
+const getTipoIcon = (tipo: string) => {
+  switch (tipo) {
+    case "critico":
+      return AlertTriangle;
+    case "atencao": 
+      return Clock;
+    case "sucesso":
+      return CheckCircle2;
+    default:
+      return TrendingUp;
+  }
+};
+
+const getTipoColor = (tipo: string) => {
+  switch (tipo) {
+    case "critico":
+      return "bg-destructive/10 text-destructive";
+    case "atencao":
+      return "bg-warning/10 text-warning"; 
+    case "sucesso":
+      return "bg-success/10 text-success";
+    default:
+      return "bg-info/10 text-info";
+  }
+};
 
 export default function Dashboard() {
   return (
@@ -105,59 +106,107 @@ export default function Dashboard() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold bg-gradient-hero bg-clip-text text-transparent">
-              Dashboard Integrado
+              Dashboard PGD-SCOPI
             </h1>
             <p className="text-muted-foreground mt-2">
-              Acompanhe o desempenho das atividades PGD com métricas SCOPI em tempo real
+              Métricas gerais de produtividade e acompanhamento do Programa de Gestão
             </p>
           </div>
           <div className="flex gap-3">
             <Button variant="outline" className="flex items-center gap-2">
               <CalendarDays size={16} />
-              Hoje: {new Date().toLocaleDateString('pt-BR')}
+              {new Date().toLocaleDateString('pt-BR')}
             </Button>
             <Button className="bg-gradient-primary hover:opacity-90">
-              <Plus size={16} className="mr-2" />
-              Nova Atividade
+              <TrendingUp size={16} className="mr-2" />
+              Relatório Completo
             </Button>
           </div>
         </div>
 
-        {/* Alerts */}
+        {/* Métricas Principais */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
+            <CardContent className="p-6">
+              <div className="text-center">
+                <p className="text-3xl font-bold text-primary">{metricasGerais.totalServidores}</p>
+                <p className="text-sm text-muted-foreground">Total Servidores</p>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
+            <CardContent className="p-6">
+              <div className="text-center">
+                <p className="text-3xl font-bold text-warning">{metricasGerais.atividadesAtivas}</p>
+                <p className="text-sm text-muted-foreground">Atividades Ativas</p>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
+            <CardContent className="p-6">
+              <div className="text-center">
+                <p className="text-3xl font-bold text-success">{metricasGerais.eficienciaMedia}%</p>
+                <p className="text-sm text-muted-foreground">Eficiência Média</p>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
+            <CardContent className="p-6">
+              <div className="text-center">
+                <p className="text-3xl font-bold text-info">{metricasGerais.aderenciaPrograma}%</p>
+                <p className="text-sm text-muted-foreground">Aderência PGD</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Alertas */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {alerts.map((alert, index) => (
-            <Card key={index} className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
-              <CardContent className="p-4">
-                <div className="flex items-start gap-3">
-                  <div className={`p-2 rounded-lg ${
-                    alert.type === 'warning' ? 'bg-warning/10' :
-                    alert.type === 'success' ? 'bg-success/10' : 'bg-info/10'
-                  }`}>
-                    <alert.icon className={`h-5 w-5 ${
-                      alert.type === 'warning' ? 'text-warning' :
-                      alert.type === 'success' ? 'text-success' : 'text-info'
-                    }`} />
+          {alertasGerais.map((alerta, index) => {
+            const Icon = getTipoIcon(alerta.tipo);
+            return (
+              <Card key={index} className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
+                <CardContent className="p-4">
+                  <div className="flex items-start gap-3">
+                    <div className={`p-2 rounded-lg ${getTipoColor(alerta.tipo)}`}>
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-medium text-sm">{alerta.titulo}</h3>
+                        {alerta.quantidade && (
+                          <Badge variant="destructive" className="text-xs">
+                            {alerta.quantidade}
+                          </Badge>
+                        )}
+                        {alerta.percentual && (
+                          <Badge variant="default" className="text-xs bg-success">
+                            {alerta.percentual}%
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">{alerta.descricao}</p>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <h3 className="font-medium text-sm">{alert.title}</h3>
-                    <p className="text-xs text-muted-foreground mt-1">{alert.description}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
 
         {/* Main Dashboard Stats */}
         <DashboardStats />
 
-        {/* Recent Activities */}
+        {/* Atividades Recentes */}
         <Card className="shadow-card border-0 bg-gradient-to-br from-card to-card/50">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
                 <Clock className="h-5 w-5 text-primary" />
-                Atividades Recentes
+                Últimas Atividades
               </CardTitle>
               <Button variant="outline" size="sm">
                 Ver Todas
@@ -165,14 +214,35 @@ export default function Dashboard() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-              {recentActivities.map((activity) => (
-                <ActivityCard
-                  key={activity.id}
-                  activity={activity}
-                  onEdit={() => console.log("Edit", activity.id)}
-                  onViewDetails={() => console.log("View details", activity.id)}
-                />
+            <div className="space-y-4">
+              {atividadesRecentes.map((atividade) => (
+                <div key={atividade.codigo} className="flex items-center justify-between p-4 rounded-lg border border-border/50 hover:border-primary/20 transition-colors">
+                  <div className="flex items-center gap-4">
+                    <Badge variant="outline" className="font-mono text-xs">
+                      {atividade.codigo}
+                    </Badge>
+                    <div>
+                      <p className="font-medium text-sm">{atividade.descricao}</p>
+                      <p className="text-xs text-muted-foreground font-mono">
+                        CPF: {atividade.cpfResponsavel}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="text-right">
+                      <p className="text-sm font-medium">{atividade.progresso}%</p>
+                      <p className="text-xs text-muted-foreground">{atividade.dataFim}</p>
+                    </div>
+                    <Badge className={
+                      atividade.status === 'concluida' ? 'bg-success/10 text-success' :
+                      atividade.status === 'em_andamento' ? 'bg-warning/10 text-warning' :
+                      'bg-muted text-muted-foreground'
+                    }>
+                      {atividade.status === 'concluida' ? 'Concluída' :
+                       atividade.status === 'em_andamento' ? 'Em Andamento' : 'Pendente'}
+                    </Badge>
+                  </div>
+                </div>
               ))}
             </div>
           </CardContent>
